@@ -14,15 +14,16 @@ class Bank extends EventEmitter {
         console.log("This person already exists");
         isNew = false;
         this.emit('error', new Error('This user already exist!'));
-
-        return null;
+  
+        return -1;
       }     
     });
 
     if (isNew) {
       if (newUser.balance <= 0) {
         this.emit('error', new Error('User balance is <= 0'));
-        return null;
+  
+        return -1;
       }
 
       let user = {
@@ -60,10 +61,14 @@ bank.on('add', function(personId, currencyAmount) {
 
   if (!this.findPerson(personId)) {
     this.emit('error', new Error('Person doesn\'t exist'));
+  
+    return -1;
   }
 
   if (currencyAmount <= 0) {
     this.emit('error', new Error('Add amount is below or equal to 0'));
+  
+    return -1;
   }
 
   this.users.forEach(user => {
@@ -76,6 +81,8 @@ bank.on('add', function(personId, currencyAmount) {
 bank.on('get', function(personId, cb) {
   if (!this.findPerson(personId)) {
     this.emit('error', new Error('Person doesn\'t exist'));
+  
+    return -1;
   }
 
   this.users.forEach(user => {
@@ -88,22 +95,61 @@ bank.on('get', function(personId, cb) {
 bank.on('withdraw', function(personId, currencyAmount) {
   if (!this.findPerson(personId)) {
     this.emit('error', new Error('Person doesn\'t exist'));
+  
+    return -1;
   }
 
   if (currencyAmount < 0) {
     this.emit('error', new Error('Add amount is below or equal to 0'));
+  
+    return -1;
   }
 
   this.users.forEach(user => {
     if (user.id === personId) {
       if (user.balance - currencyAmount < 0) {
         this.emit('error', new Error('Wrong withdraw amount'));
-        return;
+  
+        return -1;
       }
 
       user.balance -= currencyAmount;
+      
+      return 1; 
     }
   });
+});
+
+bank.on('send', function(senderId, recieverId, sendAmount) {
+  if (!this.findPerson(senderId) || !this.findPerson(recieverId)) {
+    this.emit('error', new Error('Sender/reciever doesn\'t exist'));
+  }
+
+  if (sendAmount <= 0) {
+    this.emit('error', new Error('Send amount is below or equal to 0'));
+  }
+
+  let sender = null;
+  let reciever = null;
+
+  this.users.forEach(user => {
+    if (user.id === senderId) {
+      sender = user;
+
+    }
+
+    if (user.id === recieverId) {
+      reciever = user;
+    }
+  });
+
+  this.emit('withdraw', senderId, sendAmount);
+  if (sender.balance - sendAmount <= 0) {
+
+    return 0;   
+  }
+
+  this.emit('add', recieverId, sendAmount);
 });
 
 bank.on('error', function(error) {
@@ -120,9 +166,9 @@ const personSecondId = bank.register({
   balance: 700,
 });
 
-// bank.emit('send', personFirstId, personSecondId, 50);
-// bank.emit('get', personSecondId, (balance) => {
-  // console.log(`I have ${balance}₴`); // I have 750₴
-// });
+bank.emit('send', personFirstId, personSecondId, 50);
+bank.emit('get', personSecondId, (balance) => {
+  console.log(`I have ${balance}₴`); // I have 750₴
+});
 
 console.log(bank.users);
