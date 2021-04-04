@@ -30,6 +30,7 @@ class Bank extends EventEmitter {
         name: newUser.name,
         balance: newUser.balance,
         id: this.users.length,
+        limit: newUser.limit,
       };
   
       this.users.push(user);
@@ -113,6 +114,12 @@ bank.on('withdraw', function(personId, currencyAmount) {
         return -1;
       }
 
+      if (!user.limit(currencyAmount, user.balance, user.balance - currencyAmount)) {
+        this.emit('error', new Error(`[${user.id}] send limit`));
+  
+        return -1;
+      }
+
       user.balance -= currencyAmount;
       
       return 1; 
@@ -143,13 +150,34 @@ bank.on('send', function(senderId, recieverId, sendAmount) {
     }
   });
 
-  this.emit('withdraw', senderId, sendAmount);
-  if (sender.balance - sendAmount <= 0) {
+  if (!sender.limit(sendAmount, sender.balance, sender.balance - sendAmount)) {
+    this.emit('error', new Error(`[${sender.id}] withdraw limit`));
 
-    return 0;   
+    return 0;
   }
 
+  if (sender.balance - sendAmount <= 0) {
+    this.emit('withdraw', senderId, sendAmount);
+
+    return 0;
+  }
+  this.emit('withdraw', senderId, sendAmount);
+
   this.emit('add', recieverId, sendAmount);
+});
+
+bank.on('changeLimit', function(personId, cb) {
+  if (!this.findPerson(personId)) {
+    this.emit('error', new Error('Person doesn\'t exist'));
+  
+    return;
+  }
+
+  this.users.forEach(user => {
+    if (user.id === personId) {
+      user.limit = cb;
+    }
+  });
 });
 
 bank.on('error', function(error) {
@@ -159,16 +187,26 @@ bank.on('error', function(error) {
 const personFirstId = bank.register({    
   name: 'Pitter Black',    
   balance: 100,
+  limit: amount => amount < 10,
 });
 
 const personSecondId = bank.register({    
   name: 'Oliver White',
   balance: 700,
+  limit: amount => amount < 10,
 });
 
-bank.emit('send', personFirstId, personSecondId, 50);
+bank.emit('withdraw', personSecondId, 20);
+// bank.emit('send', personFirstId, personSecondId, 20);
+bank.emit('get', personSecondId, (balance) => {
+  console.log(`I have ${balance}₴`); // I have 750₴
+});
+bank.emit('changeLimit', personSecondId, (amount, currentBalance, updatedBalance) => {
+  return amount < 100 && updatedBalance > 600;
+});
+bank.emit('withdraw', personSecondId, 99);
 bank.emit('get', personSecondId, (balance) => {
   console.log(`I have ${balance}₴`); // I have 750₴
 });
 
-console.log(bank.users);
+// console.log(bank.users);
