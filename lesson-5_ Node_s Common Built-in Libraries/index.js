@@ -41,7 +41,7 @@ const customers2 = [{
   }
 }];
 
-console.log("USERS", customers, '\n');
+// console.log("USERS", customers, '\n');
 const ui = new Ui(customers, rsOptions);
 const guardian = new Guardian(tsOptions);
 const manager = new AccountManager(wsOptions);
