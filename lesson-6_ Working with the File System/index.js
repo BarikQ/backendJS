@@ -9,14 +9,14 @@ const allowedFields = ['postId', 'id', 'name'];
 
 const converter = new Converter(allowedFields);
 const archiver = new Archiver();
+const algorithm = {
+  algorithm: 'deflate',
+};
 
-// converter.convert(filename, newFilename, options);
-// console.log(converter.convert(filename, newFilename, options));
 converter.convert(filename, newFilename, options)
   .then((archiveFile) => {
-    return archiver.archive(archiveFile);
+    return archiver.archive(archiveFile, algorithm);
   })
   .then((archivedPath) => {
-    // console.log('2_1+2_1+2_1+2_1+2_1+2_1');
-    archiver.extract(archivedPath, extractPath);
+    archiver.extract(archivedPath, extractPath, algorithm);
   });

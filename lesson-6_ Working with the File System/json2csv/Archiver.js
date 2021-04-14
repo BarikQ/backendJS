@@ -9,12 +9,23 @@ class Archiver {
 
   }
 
-  archive(filename) {
-    // console.log('11111111111111111111111');
-
-    const gzip = zlib.createGzip();
+  archive(filename, algorithm) {
     const readStream = fs.createReadStream(filename);
     let writeStream = fs.createWriteStream(`${filename}.gz`);
+    let gzip;
+
+    switch (algorithm.algorithm) {
+      case ('deflate'):
+        gzip = zlib.createDeflate();
+        console.log('DEFLATE');
+      break;
+      case ('gzip'):
+        gzip = zlib.createGzip();
+        console.log('GZIP');
+      break;
+      default:
+        throw new Error('Wrong compression algorithm!');
+    }
 
     const zipPromise = new Promise((resolve, reject) => {
       async function arch() {
@@ -44,49 +55,19 @@ class Archiver {
     });
 
     return zipPromise;
-
-    {
-    // readStream.pipe(gzip).pipe(writeStream).on('finish', () => {
-    //   console.log('zapisano');
-
-    //   return `${filename}.gz`;
-    // });
-
-    // async function arch() {
-    //   try {
-    //     await pipelineAsync(
-    //       readStream,
-    //       gzip,
-    //       writeStream
-    //     );
-
-    //     return `${filename}.gz`; 
-    //   }
-
-    //   catch (error) {
-    //     console.error("Pipeline is fucked", error);
-    //   }
-    // }
-
-    // arch().then(file => {
-    //   console.log('GFDSHS', file);
-    // });
-
-    // return `${filename}.gz`;
-    }
   }
 
-  extract(archiveFile, extractFile) {
+  extract(archiveFile, extractFile, algorithm) {
     const readStream = fs.createReadStream(archiveFile);
     let writeStream = fs.createWriteStream(extractFile);
-    const unArch = zlib.createGunzip();
+    let unzip = zlib.createUnzip();
 
     const unzipPromise = new Promise((resolve, reject) => {
       (async function arch() {
         try {
           await pipelineAsync(
             readStream,
-            unArch,
+            unzip,
             writeStream
           );
 
@@ -94,7 +75,6 @@ class Archiver {
         }
   
         catch (error) {
-          // console.error("Pipeline is 4tenie", error);
           reject(error);
         }
       })();
