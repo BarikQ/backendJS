@@ -3,12 +3,18 @@ const net = require('net');
 const client = new net.Socket();
 const PORT = 8080;
 const filter = {
-  // id: 0,
-  name: {
-    first: 'J',
-    last: 'a',
+  filter: {
+    // id: 0,
+    name: {
+      first: 'J',
+      last: 'a',
+    },
+    email: '@gmail.com',
   },
-  email: '@gmail.com',
+  meta: {
+    format: 'csv',
+    archive: true,
+  }
 };
 
 client.connect(PORT, () => {
