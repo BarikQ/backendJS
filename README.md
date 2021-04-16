@@ -1,3 +1,3 @@
 # backendJS
 
-# Lesson 2: Concurrency Model and Event Loop
+# lesson 6: Working with the File System
