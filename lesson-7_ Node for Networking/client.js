@@ -12,8 +12,8 @@ const filter = {
     email: '@gmail.com',
   },
   meta: {
-    format: 'csv',
-    archive: true,
+    format: 'json',
+    archive: false,
   }
 };
 
@@ -24,8 +24,6 @@ client.connect(PORT, () => {
 client.on('connect', () => {
   console.log('Connected!');
   client.write(JSON.stringify(filter));
-
-  client.end();
 });
 
 client.on('close', () => {
@@ -37,5 +35,7 @@ client.on('error', (error) => {
 });
 
 client.on('data', (data) => {
-  console.log(JSON.parse(data.toString()));
-})
+  console.log(data.toString());
+});
+
+let timeout = setTimeout(() => client.end(), 5000);

@@ -1,4 +1,6 @@
-const Filter = require('./filter');
+const { Convert, Filter, Archiever } = require('./tools/index.js');
+const { pipeline } = require('stream');
+const zlib = require('zlib');
 const net = require('net');
 const fs = require('fs');
 
@@ -11,9 +13,24 @@ let filter = 0;
 server.on('connection', (socket) => {
   socket.on('data', (msg) => {
 
-    let filtred = filter.filter(JSON.parse(msg.toString()));
-    console.log(filtred, '\n', filtred.length);
-    socket.write(JSON.stringify(filtred));
+    let object = JSON.parse(msg.toString());
+    let filtred = filter.filter(object.filter);
+
+    const converter = new Convert({ objectMode: true }, object.meta);
+    let gzip;
+
+    if (object.meta.archive === true) {
+      gzip = zlib.createGzip();
+    } else {
+      gzip = socket;
+    }
+
+    pipeline(filtred, converter, gzip, socket, error => {
+      if (error) {
+        console.log('PIZDEC');
+        throw new Error(error);
+      }
+    });
 
   });
 
@@ -22,7 +39,7 @@ server.on('connection', (socket) => {
   });
 
   socket.on('error', (error) => {
-    console.log(error);
+    throw new Error(error);
   });
 });
 
@@ -40,7 +57,7 @@ server.on('error', (error) => {
 
 (async function() {
   let readUsersBase = new Promise((resolve, reject) => {
-    fs.readFile('users.json', 'utf8', (error, data) => {
+    fs.readFile('./data/users.json', 'utf8', (error, data) => {
       if (error) {
         throw new Error(error);
       }

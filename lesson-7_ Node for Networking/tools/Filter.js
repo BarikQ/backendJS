@@ -15,15 +15,9 @@ class Filter {
           }
 
           if (key === prop) {
-            // console.log(true);
             res = this.typeFilter(user, key, query);
 
-            if (res) {
-              // console.log(true, user[key], query[key]);
-              // console.log('1');
-              continue;
-            } else {
-              // console.log('2');
+            if (!res) {
               break;
             }
           }
@@ -40,7 +34,6 @@ class Filter {
       }
 
       if (res === true) {
-        // console.log(user);
         return user;
       }
 
@@ -52,20 +45,13 @@ class Filter {
 
     switch (typeof field[key]) {
       case ('string'):
-        // console.log(field[key], query[key], key);
         return (field[key].includes(query[key])) ? true : false;
 
-      break;
-
       case ('number'):
-        // console.log(field[key], query[key], key);
         return (field[key] === query[key]) ? true : false;
-
-      break;
 
       case ('object'):
         let res;
-        // console.log(field[key], query[key], key);
         for (let prop in field[key]) {
           if (res === false) {
             return false;
@@ -75,15 +61,10 @@ class Filter {
 
         return res;
 
-      break;
-
       default:
         throw new Error(`Format doesn't fit`);  
-      break;
 
     }
-
-    return result;
   }
 }
 
