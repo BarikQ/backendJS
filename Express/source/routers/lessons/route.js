@@ -1,6 +1,10 @@
 export const get = (req, res) => {
   try {
-    res.status(200).json({ data: ['Lessons']});
+    const data = {
+      data: ['Lessons'],
+    };
+
+    res.status(200).json(data);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -8,7 +12,11 @@ export const get = (req, res) => {
 
 export const post = (req, res) => {
   try {
-    res.status(201).json({ data: req.body });
+    const data = {
+      data: req.body
+    };
+
+    res.status(201).json(data);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

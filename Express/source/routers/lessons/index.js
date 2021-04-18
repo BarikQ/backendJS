@@ -2,7 +2,10 @@ import express from 'express';
 
 export const router = express.Router();
 
-import { get, post } from './handlers';
+// Utils
+import { limiter, validator } from '../../utils';
+
+import { get, post } from './route';
 import { getByHash, putByHash, deleteByHash } from './hash';
 import { addVideo } from './hash/videos';
 import { getVideoByHash, deleteVideoByHash } from './hash/videos/hash';

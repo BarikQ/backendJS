@@ -1,6 +1,10 @@
 export const getByHash = (req, res) => {
     try {
-        res.status(200).json({ data: {'hash':req.params.userHash} });
+        const data = {
+            data: { 'hash':req.params.userHash },
+        };
+
+        res.status(200).json(data);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -8,10 +12,12 @@ export const getByHash = (req, res) => {
 
 export const putByHash = (req, res) => {
     try {
-        res.status(200).json({
+        const data = {
             data: {'hash':req.params.userHash},
             body: req.body,
-         });
+        };
+
+        res.status(200).json(data);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -19,7 +25,7 @@ export const putByHash = (req, res) => {
 
 export const deleteByHash = (req, res) => {
     try {
-        res.status(204).send('(no example available)');
+        res.sendStatus(204);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

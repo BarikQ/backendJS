@@ -1,19 +1,19 @@
-export const getKeynoteByHash = (req, res) => {
+export const enrollByHash = (req, res) => {
   try {
     const data = {
-      data: {'keynote':req.params.keynoteHash}
+      data: req.body,
     };
 
-    res.status(200).json(data);
+    res.status(204).json(data);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-export const deleteKeynoteByHash = (req, res) => {
+export const expelByHash = (req, res) => {
   try {
     const data = {
-      hash: req.params.keynoteHash,
+      data: req.body,
     };
 
     res.status(204).json(data);

@@ -1,7 +1,11 @@
 export const addVideo = (req, res) => {
   try {
-      res.status(204).send('(no example available)');
+    const data = {
+
+    };
+
+    res.status(204).json(data);
   } catch (error) {
-      res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };

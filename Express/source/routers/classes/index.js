@@ -2,13 +2,12 @@ import express from 'express';
 
 export const router = express.Router();
 
-import { get, post } from './handlers';
-import { getByHash, 
-  putByHash, 
-  deleteByHash, 
-  enrollByHash, 
-  expelByHash,
-} from './hash';
+// Utils
+import { limiter, validator } from '../../utils';
+
+import { get, post } from './route';
+import { getByHash, putByHash,  deleteByHash } from './hash';
+import { enrollByHash, expelByHash } from './education';
 
 router.get('/', get);
 router.post('/', post);
